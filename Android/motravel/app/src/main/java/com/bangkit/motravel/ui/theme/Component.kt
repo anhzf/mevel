@@ -295,5 +295,38 @@ fun Button(
     }
 }
 
+@ExperimentalMaterial3Api
+@Composable
+fun ButtonWithPainter(
+    iconId: Int,
+    text: String,
+    fontSize: Int = 12,
+    contentDescription: String,
+    modifier: Modifier,
+    onClick: () -> Unit
+){
+    Button(
+        onClick = onClick,
+        shape = RoundedCornerShape(20.dp),
+        modifier = modifier,
+        elevation = buttonElevation(defaultElevation = 3.dp),
+        contentPadding = PaddingValues(0.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(1f)
+        ){
+            Icon(
+                painter = painterResource(id = iconId),
+                contentDescription = contentDescription,
+                modifier = Modifier.padding(start = 16.dp, end = 8.dp),
+                tint = LocalContentColor.current
+            )
+
+            Text(text = text, fontSize = fontSize.sp)
+        }
+    }
+}
+
 
 

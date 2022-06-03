@@ -233,15 +233,6 @@ fun HomeRecentlyAdded(){
     }
 }
 
-@ExperimentalMaterial3Api
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview(){
-    MotravelTheme {
-
-    }
-}
-
 @Parcelize
 data class DataImage(
     val idImage: Int,
