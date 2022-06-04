@@ -24,7 +24,7 @@ app.get('/:providerName/:factoryName', middleware(), async (req, res, next) => {
     if (factoryName in provider) {
       const factory: () => unknown = provider[factoryName as keyof typeof provider];
       const count = Number(req.query.count) || COLLECTION_COUNT;
-      return res.json(Array.from(Array(count), factory.bind(null, { _: req.query.params })));
+      return res.json(Array.from(Array(count), factory.bind(null, { _: req.query.field })));
     }
   } catch (err) { }
   next();
