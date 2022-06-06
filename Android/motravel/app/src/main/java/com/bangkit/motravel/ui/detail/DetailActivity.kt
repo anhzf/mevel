@@ -50,7 +50,6 @@ fun DetailImagePreview(){
     val dataImageSm = dummyImageSmall()
     val state = rememberLazyListState()
     val verticalScrollState = rememberScrollState()
-
     val navController = rememberNavController()
 
     Column(
@@ -210,18 +209,6 @@ fun DetailDescription(
         Text(text = "Lokasi")
         Text(text = dataDummy.address)
         Text(text = "Wajib Dicoba")
-    }
-}
-
-// Testing Component
-@ExperimentalMaterial3Api
-@Preview(showBackground = true)
-@Composable
-fun RatingPreview(){
-    MotravelTheme {
-        Column {
-            DetailImagePreview()
-        }
     }
 }
 

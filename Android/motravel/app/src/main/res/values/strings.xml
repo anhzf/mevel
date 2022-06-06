@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">motravel</string>
+    <string name="error_api_key">No Api Key</string>
+    <string name="pick_place">Pick Place</string>
+    <string name="default_info_title">Default Info Title</string>
+    <string name="default_info_snippet">Default Info Snippet</string>
+    <string name="title_activity_add_places">AddPlacesActivity</string>
 </resources>

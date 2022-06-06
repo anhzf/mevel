@@ -40,9 +40,11 @@ class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Configure Google Sign In
+        val token = "636438023201-nmpj0256s8qrjeouukkiluut2008qspl.apps.googleusercontent.com"
         val gso = GoogleSignInOptions
             .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id)) // Ignore this error, Id inside build debug
+            .requestIdToken(token)
+            //.requestIdToken(getString(R.string.default_web_client_id)) // Ignore this error, Id inside build debug
             .requestEmail()
             .build()
 
@@ -50,6 +52,7 @@ class LoginActivity : ComponentActivity() {
 
         // Initialize Firebase Auth
         auth = Firebase.auth
+        auth.useEmulator("192.168.1.7", 9099)
 
         // Compose UI
         setContent {

@@ -1,5 +1,6 @@
 package com.bangkit.motravel.ui.theme
 
+import android.graphics.drawable.Icon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -7,7 +8,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
@@ -20,12 +20,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.*
 import androidx.compose.material3.ButtonDefaults.buttonElevation
+import androidx.compose.runtime.*
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import com.bangkit.motravel.ui.detail.DetailImagePreview
 import com.bangkit.motravel.ui.home.dummyImageLarge
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.maps.android.compose.*
+import com.google.android.gms.maps.model.LatLng
 
 @Composable
 fun TitleText(text: String){
@@ -325,6 +332,65 @@ fun ButtonWithPainter(
 
             Text(text = text, fontSize = fontSize.sp)
         }
+    }
+}
+
+@ExperimentalMaterial3Api
+@Composable
+fun ProfileAvatar(
+    painter: Painter,
+    contentDescription: String
+){
+    Image(
+        painter = painter,
+        contentDescription = contentDescription,
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+            .clip(RoundedCornerShape(100.dp))
+            .size(100.dp)
+    )
+}
+
+@ExperimentalMaterial3Api
+@Composable
+fun TextFieldWithIcons(
+    text: String,
+    imageVector: ImageVector,
+    iconDescription: String,
+    label: String,
+    placeholder: String
+) {
+    OutlinedTextField(
+        value = text,
+        leadingIcon = { Icon(imageVector = imageVector, contentDescription = iconDescription) },
+        onValueChange = {  },
+        label = { Text(text = label) },
+        placeholder = { Text(text = placeholder) },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+    )
+}
+@ExperimentalMaterial3Api
+@Composable
+fun MyGoogleMap(
+    location: LatLng,
+    zoom: Float = 10f,
+    title: String,
+    snippet: String
+){
+    val cameraPositionState = rememberCameraPositionState{
+        position = CameraPosition.fromLatLngZoom(location, zoom)
+    }
+    GoogleMap(
+        modifier = Modifier.fillMaxSize(),
+        cameraPositionState = cameraPositionState
+    ) {
+        Marker(
+            state = MarkerState(position = location),
+            title = title,
+            snippet = snippet
+        )
     }
 }
 
