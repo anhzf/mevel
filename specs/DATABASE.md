@@ -9,9 +9,10 @@
     - [User](#user)
     - [User RecommendationPreference](#user-recommendationpreference)
     - [User SettingsPreference](#user-settingspreference)
-    - [User Agenda](#user-agenda)
+    - [Media](#media)
     - [Place](#place)
-    - [Place Review](#place-review)
+    - [Place Story](#place-story)
+    - [Place Story Vote](#place-story-vote)
     - [Address](#address)
     - [VisitNumber](#visitnumber)
 
@@ -65,18 +66,22 @@ Setiap Dokumen berada dalam suatu Collection, Collection dapat disamakan dengan 
 | ----- | ---- | ---- |
 | -     | -    | -    |
 
-### User Agenda
+### Media
 - **Type**: Document
-- **Collection path**: /User/:userId/Agenda
+- **Collection path**: /Media
 - **Document ID**: *Auto generated*
-- **Desc**: Agenda tempat-tempat yang ditambahkan user.
+- **Desc**: Menyimpan data media yang diupload.
 
-| Field        | Type                   | Desc                         |
-| ------------ | ---------------------- | ---------------------------- |
-| place        | ref\<[Place](#place)\> | Tempat dimaksud.             |
-| markedAsDone | boolean                | Tertandai telah selesai.     |
-| createdAt    | datetime               | Tanggal ditambahkan.         |
-| updatedAt    | datetime               | Tanggal terakhir diperbarui. |
+| Field      | Type                 | Desc                                                                           |
+| ---------- | -------------------- | ------------------------------------------------------------------------------ |
+| src        | string               | Alamat absolut cloud storage                                                   |
+| title?     | string               | Judul gambar                                                                   |
+| desc?      | string               | Deskripsi singkat gambar, dapat digunakan sebagai `alt` attribute pada html    |
+| owner?     | ref\<[User](#user)\> | Pemilik media                                                                  |
+| uploadedBy | ref\<[User](#user)\> | Pengupload media                                                               |
+| createdAt  | datetime             | Tanggal media diupload                                                         |
+| ...        | *any*                | Field yang tidak terdefinisikan akan dikategorikan sebagai informasi tambahan. |
+
 
 ### Place
 - **Type**: Document
@@ -84,47 +89,69 @@ Setiap Dokumen berada dalam suatu Collection, Collection dapat disamakan dengan 
 - **Document ID**: *Auto generated*
 - **Desc**: Pada interface aplikasi sering biasa disebut dengan `Destinasi`.
 
-| Field        | Type                               | Desc                                                                                                     |
-| ------------ | ---------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| title        | string                             | Nama publik yang ditampilkan.                                                                            |
-| imgSrc       | string[]                           | Alamat absolut Cloud Storage (ex: gs://user-uploads/gamber.png). Gambar pertama merupakan featured image |
-| address      | map\<[Address](#address)\>         | Alamat tempat.                                                                                           |
-| visits?      | map\<[VisitNumber](#visitnumber)\> | Jumlah kunjungan per periode waktu.                                                                      |
-| ratings?     | computed\<number>                  | Rating, range angka 1-5.                                                                                 |
-| reviewCount? | computed\<number>                  | Jumlah orang yang memberi ulasan.                                                                        |
-| budgetRange? | number[]                           | Range budget minimal dan maksimal.                                                                       |
-| taskItems?   | string[]                           | Daftar kegiatan yang harus dilakukan.                                                                    |
-| desc?        | string                             | Deskripsi lokasi. (Format: markdown)                                                                     |
-| keywords     | string[]                           | Kata kunci lokasi.                                                                                       |
-| submittedBy? | ref\<[User](#user)\>               | Orang yang menambahkan lokasi ini.                                                                       |
-| developedBy? | string                             | Pengelola lokasi.                                                                                        |
-| createdAt    | datetime                           | Tanggal ditambahkan.                                                                                     |
-| updatedAt    | datetime                           | Tanggal terakhir diperbarui.                                                                             |
-| ...          | *any*                              | Field yang tidak terdefinisikan akan dikategorikan sebagai informasi tambahan.                           |
+| Field         | Type                               | Desc                                                                           |
+| ------------- | ---------------------------------- | ------------------------------------------------------------------------------ |
+| title         | string                             | Nama publik yang ditampilkan.                                                  |
+| imgSrc        | ref\<[Media](#address)\>[]         | Gambar2 tempat. Gambar pertama dalam array merupakan featured image.           |
+| address       | map\<[Address](#address)\>         | Alamat tempat.                                                                 |
+| visits?       | map\<[VisitNumber](#visitnumber)\> | Jumlah kunjungan per periode waktu.                                            |
+| ratingScore?  | computed\<number>                  | Rating, total skor rating yang didapatkan.                                     |
+| reviewCount?  | computed\<number>                  | Jumlah orang yang memberi ulasan.                                              |
+| desc?         | string                             | Deskripsi lokasi. (Format: markdown)                                           |
+| category      | string                             | enum(alam_darat,alam_laut,alam_salju,seni,sports)                              |
+| keywords      | string[]                           | Kata kunci lokasi.                                                             |
+| submittedBy?  | ref\<[User](#user)\>               | Orang yang menambahkan lokasi ini.                                             |
+| developedBy?  | string                             | Pengelola lokasi.                                                              |
+| gmapsPlaceId? | string                             | PlaceId dari Google Maps.                                                      |
+| createdAt     | datetime                           | Tanggal ditambahkan.                                                           |
+| updatedAt     | datetime                           | Tanggal terakhir diperbarui.                                                   |
+| budgetRange?  | number[]                           | Range budget minimal dan maksimal.                                             |
+| taskItems?    | string[]                           | Daftar kegiatan yang harus dilakukan.                                          |
+| ...           | *any*                              | Field yang tidak terdefinisikan akan dikategorikan sebagai informasi tambahan. |
 
-### Place Review
+### Place Story
 - **Type**: Document
 - **Collection path**: /Place/:placeId/Review
 - **Document ID**: Diambil dari ID User yang melakukan review.
 - **Desc**: Review suatu tempat.
 
-| Field     | Type     | Desc                         |
-| --------- | -------- | ---------------------------- |
-| rating    | number   | Range angka 1-5              |
-| comment?  | string   | Komen opsional               |
-| media?    | string[] | Alamat absolut Cloud Storage |
-| createdAt | datetime | Tanggal ditambahkan.         |
-| updatedAt | datetime | Tanggal terakhir diperbarui. |
+| Field     | Type               | Desc                         |
+| --------- | ------------------ | ---------------------------- |
+| rating    | number             | Range angka 1-5              |
+| comment?  | string             | Komen opsional               |
+| media?    | string[]           | Alamat absolut Cloud Storage |
+| upvoted   | computed\<number\> | Jumlah Upvote                |
+| downvoted | computed\<number\> | Jumlah Downvote              |
+| createdAt | datetime           | Tanggal ditambahkan.         |
+| updatedAt | datetime           | Tanggal terakhir diperbarui. |
+
+### Place Story Vote
+- **Type**: Document
+- **Collection path**: /Place/:placeId/Review
+- **Document ID**: *Auto generated*
+- **Desc**: Fitur Upvote/Downvote Story
+
+| Field      | Type    | Desc                                    |
+| ---------- | ------- | --------------------------------------- |
+| ...userdId | boolean | true untuk Upvote, false untuk Downvote |
+
+**Penjelasan**
+
+Jadi nanti bukan setiap Vote akan disimpan sebagai dokumen, akan tetapi setiap dokumen akan menyimpan 20 Vote. Dokumen akan berisi field dengan nama `key`-nya adalah userId yang melakukan vote, kemudian `value`-nya berisi boolean true/false. `true` untuk Upvote dan `false` untuk Downvote.
+
+Hal ini bertujuan untuk menghemat banyaknya dokumen yang disimpan dalam Firestore sehingga akan menghemat billing. [see pricing](https://firebase.google.com/pricing)
 
 ### Address
 - **Type**: Object
 - **Desc**: Alamat
 
-| Field     | Type   | Desc |
-| --------- | ------ | ---- |
-| province? | string | -    |
-| city?     | string | -    |
-| addresses | string | -    |
+| Field          | Type               | Desc              |
+| -------------- | ------------------ | ----------------- |
+| province?      | string             | -                 |
+| city?          | string             | -                 |
+| addresses?     | string             | -                 |
+| displayAddress | string             | -                 |
+| latlong?       | geographical point | Koordinat Latlong |
 
 ### VisitNumber
 - **Type**: Object
