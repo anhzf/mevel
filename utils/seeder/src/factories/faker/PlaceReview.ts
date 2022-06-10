@@ -1,8 +1,8 @@
 import { faker } from '@faker-js/faker';
-import type { PlaceReview } from '../../../types';
+import type { PlaceStory } from '../../../../types/schema';
 import type { Factory } from '../types';
 
-const factory: Factory<PlaceReview> = ({ _ } = {}) => Object.assign({
+const factory: Factory<PlaceStory> = ({ _ } = {}) => Object.assign({
   rating: faker.datatype.number({ min: 1, max: 5 }),
   comment: faker.lorem.paragraphs(faker.datatype.number(3)),
   media: faker.helpers.uniqueArray(

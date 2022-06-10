@@ -11,5 +11,8 @@
   "license": "ISC",
   "workspaces": [
     "seeder"
-  ]
+  ],
+  "dependencies": {
+    "firebase-admin": "^10.2.0"
+  }
 }

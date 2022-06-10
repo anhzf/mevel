@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import type { Place } from '../../../types';
+import type { Place } from '../../../../types/schema';
 import type { Factory } from '../types';
 
 const factory: Factory<Place> = ({ _ } = {}) => Object.assign({
