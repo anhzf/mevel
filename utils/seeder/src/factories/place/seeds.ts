@@ -13,6 +13,12 @@ import type { Tourism, TourismCategory } from './schema';
 
 axiosRetry(axios, { retries: 3, retryDelay: (count) => count * 2000 });
 
+interface SeedHistory {
+  places: string[]; // IDs
+  photos: string[]; // IDs
+  updatedAt: Date;
+}
+
 const batches = (() => {
   // https://firebase.google.com/docs/firestore/quotas#writes_and_transactions
   const IDLE_TIME = 60000;
@@ -105,6 +111,16 @@ const inferCategory = (category: TourismCategory): Place['category'] => {
   }
 }
 
+const seedingHistory = (() => {
+  const filePath = resolve(cacheDir, 'seedingHistory.json');
+  const data: SeedHistory = existsSync(filePath)
+    ? JSON.parse(readFileSync(filePath).toString())
+    : { places: [], photos: [], updatedAt: new Date() };
+  const save = () => writeFileSync(filePath, JSON.stringify(data, null, 2));
+
+  return { data, save };
+})();
+
 const detailsCache = (() => {
   const cachePath = resolve(cacheDir, 'places.json');
   let cached: any[] = [];
@@ -176,10 +192,7 @@ const getMoreDetails = async (placeName: string) => {
 const resolvePlacePhoto = async (photoRef: string) => {
   const cached = photosCache.find(photoRef);
 
-  if (cached) {
-    photosCache.save(photoRef, cached);
-    return cached;
-  }
+  if (cached) return cached;
 
   try {
     const placePhotoUrl = `https://maps.googleapis.com/maps/api/place/photo?photo_reference=${encodeURIComponent(photoRef)}&maxwidth=1600&key=${process.env.API_KEY}`;
@@ -212,13 +225,32 @@ const mergeDetails = async (place: Place): Promise<Place> => {
 
   if (!details) return place;
 
+  const photos = Array.isArray(details.photos) ? (
+    console.log(chalk.bold(place.title) + `: downloading and saving ${chalk.bold(details.photos.length)} photos...`),
+    await Promise.all(details.photos.map(async (p: any) => {
+      const alreadySaved = seedingHistory.data.photos.find((el) => el === p.photo_reference);
+
+      if (alreadySaved) {
+        console.log(chalk.bold(place.title) + `: photo ${chalk.bold(p.photo_reference)} already saved!`);
+        const snapshot = await collection.Media.where('placeApi_photoReference', '==', p.photo_reference).limit(1).get();
+        return snapshot.docs[0];
+      }
+
+      const uploaded = await uploadMedia(
+        await resolvePlacePhoto(p.photo_reference),
+        { batch: batches as WriteBatch, metadata: { placeApi_photoReference: p.photo_reference } }
+      );
+
+      seedingHistory.data.photos.push(uploaded.id);
+
+      return uploaded;
+    }).filter(Boolean))
+  ) : []
+
   const merged: Place = {
     ...place,
     mapsUrl: details.url,
-    imgSrc: (Array.isArray(details.photos)) ? (
-      console.log(chalk.bold(place.title) + `: downloading and saving ${chalk.bold(details.photos.length)} photos...`),
-      await Promise.all(details.photos.map(async (p: any) => uploadMedia(await resolvePlacePhoto(p.photo_reference), { batch: batches as WriteBatch })).filter(Boolean))
-    ) : [],
+    imgSrc: photos,
     address: {
       city: details.address_components?.find((c: any) => c.types.includes('locality'))?.long_name
         || place.address || null,
@@ -260,9 +292,15 @@ export default async (start?: number, end?: number) => {
   console.log('\nsaving before exit...');
 
   placesWithDetails.forEach((place) => {
+    const alreadySaved = seedingHistory.data.places.find((el) => el === place.fromGmaps?.placeId);
+
+    if (alreadySaved) return console.log(chalk.bold(place.title) + `: place already saved!`);
+
     const ref = collection.Place.doc();
     batches.create(ref, place);
+    if (place.fromGmaps) seedingHistory.data.places.push(place.fromGmaps.placeId);
   });
 
   await batches.commit();
+  seedingHistory.save();
 }

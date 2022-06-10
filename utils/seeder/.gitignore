@@ -1,2 +1,4 @@
 /dist
 test.*
+# prefer parent workspace to handle lock file
+package-lock.json
