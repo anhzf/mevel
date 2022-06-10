@@ -241,7 +241,7 @@ const mergeDetails = async (place: Place): Promise<Place> => {
         { batch: batches as WriteBatch, metadata: { placeApi_photoReference: p.photo_reference } }
       );
 
-      seedingHistory.data.photos.push(uploaded.id);
+      seedingHistory.data.photos.push(p.photo_reference);
 
       return uploaded;
     }).filter(Boolean))

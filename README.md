@@ -13,6 +13,7 @@
     - [Menggunakan Firebase Emulator](#menggunakan-firebase-emulator)
       - [Menjalankan Emulator](#menjalankan-emulator)
       - [Integrasi Firebase Emulator ke Projek](#integrasi-firebase-emulator-ke-projek)
+      - [Seeding](#seeding)
   - [Disclaimer](#disclaimer)
 
 
@@ -71,6 +72,9 @@ firebase emulators:start
 #### Integrasi Firebase Emulator ke Projek
 https://firebase.google.com/docs/emulator-suite/connect_and_prototype
 
+
+#### Seeding
+Dokumentasi seeding dapat dilihat lebih lanjut [disini](./utils/seeder/README.md).
 
 ## Disclaimer
 Projek ini didedikasikan untuk Capstone Project [Bangkit 2022](https://bangkit.academy/).
